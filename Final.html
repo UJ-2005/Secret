@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>1st Monthsarry</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Georgia', serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      transition: background-image 0.5s ease;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    /* Login Screen */
+    .login-container {
+      background: rgba(142, 35, 113, 0.95);
+      padding: 2rem 3rem;
+      border-radius: 10px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+
+    .login-container h2 {
+      margin-bottom: 1.5rem;
+    }
+
+    .login-container input {
+      width: 90%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: #d98c8c;
+      border: none;
+      color: white;
+      font-size: 1.1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .login-container button:hover {
+      background-color: #ea0d0d;
+    }
+
+    .error-message {
+      color: #e31515;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    /* Album Container */
+    #albumSection {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    #albumSection h1 {
+      color: white;
+      text-shadow: 1px 1px 4px #000;
+      margin-bottom: 1rem;
+      user-select: none;
+    }
+
+    .album-wrapper {
+      width: 100%;
+      height: 440px;
+      overflow: hidden;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.1), 0 10px 30px rgba(0,0,0,0.3);
+      background: rgba(255,255,255,0.8);
+    }
+
+    .album {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .page {
+      min-width: 100%;
+      height: 100%;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      box-sizing: border-box;
+      padding: 20px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: transform 0.5s ease;
+      border-radius: 10px;
+    }
+
+    .page img:not(.slideshow-image) {
+      width: 50%;
+      height: 400px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      user-select: none;
+    }
+
+    .slideshow-container {
+      position: relative;
+      width: 50%;
+      height: 400px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      background: #fff;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .slideshow-image {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+      opacity: 0;
+      transition: opacity 0.7s ease;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .slideshow-image.active {
+      opacity: 1;
+    }
+
+    .slideshow-controls {
+      display: none;
+    }
+
+    .text {
+      width: 50%;
+      color: #333;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      padding: 0 1rem;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+      transition: color 0.4s ease, transform 0.5s ease, opacity 0.5s ease;
+      opacity: 0;
+      transform: translateY(20px);
+      user-select: text;
+    }
+
+    .text.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .text:hover {
+      color: #a25252;
+      transform: scale(1.05);
+    }
+
+    .buttons {
+      margin-top: 1.5rem;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .buttons button {
+      background-color: #d98c8c;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .buttons button:hover {
+      background-color: #c17676;
+    }
+
+    #logoutBtnAlbum:hover {
+      background-color: #357ab7;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container" id="loginBox">
+  <h2>Login</h2>
+  <div class="error-message" id="errorMsg">Invalid username or password.</div>
+  <input type="text" id="username" placeholder="Username" autocomplete="off" />
+  <input type="password" id="password" placeholder="Password" autocomplete="off" />
+  <button id="loginBtn">Log In</button>
+</div>
+
+<div id="albumSection">
+  <h1>MGA KAGANAPAN BAGO ANG MONTHSARRY</h1>
+  <div class="album-wrapper">
+    <div class="album" id="album"></div>
+  </div>
+  <div class="buttons">
+    <button id="prevBtn">Previous</button>
+    <button id="nextBtn">Next</button>
+  </div>
+</div>
+
+<script>
+  const usernameInput = document.getElementById('username');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+  const loginBox = document.getElementById('loginBox');
+  const albumSection = document.getElementById('albumSection');
+  const errorMsg = document.getElementById('errorMsg');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const logoutBtnAlbum = document.getElementById('logoutBtnAlbum');
+  const album = document.getElementById('album');
+
+  const accounts = [
+    { username: "love", password: "07242025" },
+    { username: "Love", password: "07242025" },
+    { username: "LOVE", password: "07242025" }
+  ];
+
+  const pages = [
+    { //Intro
+      background: "url('BG_Heart2.jpg')",
+      img: "Int1.jpg",
+      text: "<h1>HELLO LOVE</h1>In loving you, I have found a fierce truth my soul’s desire, my eternal flame, the only home where my heart can truly rest."
+    },
+    { //Page1
+      background: "url('BG_DonMac.jpg')",
+      slideshowImages: [
+        "DonMac1.jpg",
+        "DonMac2.jpg",
+        "DonMac3.jpg",
+        "DonMac4.jpg",
+        "DonMac5.jpg",
+        "DonMac6.jpg",
+        "DonMac7.jpg",
+        "DonMac8.jpg",
+        "DonMac9.jpg",
+        "DonMac10.jpg",
+        "DonMac11.jpg",
+        "DonMac12.jpg",
+        "DonMac13.jpg"
+        ],
+      text: "<h1>July 14, 2025</h1>The first time you invited me for iced coffee, I saw more than a drink. I saw your patience, your smile, your voice, and the way my heart raced like lightning when I looked at you. In that little café, I realized all I ever wanted was every moment with you.",
+    },
+    { //Page2
+      background: "url('BG_Boulevard.jpg')",
+      slideshowImages: [
+      "Bou1.jpg",
+      "Bou2.jpg",
+      "Bou3.jpg",
+      "Bou4.jpg",
+      "Bou5.jpg",
+      ],
+      text: "<h1>July 22, 2025(Kadlawon)</h1>As we walk together, every step felt lighter with you beside me. The way your presence lingers in the air makes even the simplest path feel like a journey worth remembering. I don’t need grand places or moments, just walking next to you already feels like forever in motion."
+    },
+    { //Page3
+      background: "url('BG_Macasandig.jpg')",
+      slideshowImages: [
+      "Mac1.jpg",
+      "Mac2.jpg",
+      "Mac3.jpg",
+      "Mac4.jpg",
+      "Mac5.jpg",
+      "Mac6.jpg",
+      "Mac7.jpg",
+      "Mac8.jpg",
+      "Mac9.jpg",
+      "Mac10.jpg",
+      "Mac11.jpg",
+      "Mac12.jpg",
+      "Mac13.jpg",
+      "Mac14.jpg",
+      "Mac15.jpg",
+      "Mac16.jpg",
+      "Mac17.jpg",
+      "Mac18.jpg",
+      "Mac19.jpg",
+      "Mac20.jpg",
+      "Mac21.jpg"
+      ],
+      text: "<h1>July 22, 2025(Gabie)</h1>As we sat near the bridge eating and drinking, I found myself more drawn to you than the view. The lights reflecting on the water were beautiful, but nothing compared to the glow in your eyes when you smiled. Every bite and sip felt sweeter just because you were there, its just simply memory but i’ll cherish it forever."
+    },
+    { //Page4
+      background: "url('BG_Kurimi.jpg')",
+      slideshowImages: [
+      "Kur1.jpg",
+      "Kur2.jpg",
+      "Kur3.jpg",
+      "Kur4.jpg",
+      "Kur5.jpg",
+      "Kur6.jpg",
+      "Kur7.jpg",
+      "Kur8.jpg",
+      "Kur9.jpg",
+      "Kur10.jpg"
+      ],
+      text: "<h1>July 23, 2025(Hapon)</h1>Sitting with you, sharing pizza and sipping C2, felt like the simplest yet sweetest kind of happiness. I didn’t need anything fancy, just your laughter between bites, and the comfort of knowing that even in moments this ordinary, my heart chooses you over and over again."
+    },
+    { //Page5
+      background: "url('BG_Eden.jpg')",
+      slideshowImages: [
+      "Eden1.jpg",
+      "Eden2.jpg",
+      "Eden3.jpg",
+      "Eden4.jpg",
+      "Eden5.jpg",
+      "Eden6.jpg",
+      "Eden7.jpg",
+      "Eden8.jpg",
+      "Eden9.jpg",
+      "Eden10.jpg",
+      "Eden11.jpg",
+      "Eden12.jpg"
+      ],
+      text: "<h1>July 23, 2025(Gabie)</h1>As we gazed at the city lights together, I couldn’t take my eyes off you the way the glow reflected in your smile made the whole skyline feel dim in comparison. Standing there beside you, i realized the lights weren’t what made the night beautiful, it was you and the feeling of having you right next to me."
+    },
+    { //Page 6
+      background: "url('BG_Fukuro.jpg')",
+      slideshowImages: [
+      "Fukuro1.jpg",
+      "Fukuro2.jpg",
+      "Fukuro3.jpg",
+      "Fukuro4.jpg",
+      "Fukuro5.jpg",
+      "Fukuro6.jpg",
+      "Fukuro7.jpg",
+      "Fukuro8.jpg",
+      "Fukuro9.jpg",
+      "Fukuro10.jpg",
+      "Fukuro11.jpg"
+      ],
+      text: "<h1>July 24, 2025</h1>It’s late, the city humming softly outside the café windows, but in here, it feels like time has slowed just for us. The glow from the hanging lights casts a golden warmth over your face as you lifts your cup, and I can’t help but smile. Our knees touch beneath the small table, a quiet reminder that we’re here, together."
+    },
+    { //Page7
+      background: "url('BG_Greenwich.jpg')",
+      slideshowImages: [
+      "Green1.jpg",
+      "Green2.jpg",
+      "Green3.jpg",
+      "Green4.jpg",
+      "Green5.jpg",
+      "Green6.jpg",
+      "Green7.jpg",
+      "Green8.jpg",
+      "Green9.jpg",
+      "Green10.jpg",
+      "Green11.jpg"
+      ],
+      text: "<h1>July 25, 2025</h1>With slices of pizza in hand and iced tea sweating on the table, we laughed between bites, stealing glances and crumbs. It wasn’t a fancy dinner, but your smile made it feel like a feast."
+    },
+    { //Page8
+      background: "url('BG_Greenwich.jpg')",
+      slideshowImages: [
+      "Greenw1.jpg",
+      "Greenw2.jpg",
+      "Greenw3.jpg",
+      "Greenw4.jpg",
+      "Greenw5.jpg",
+      "Greenw6.jpg",
+      "Greenw7.jpg",
+      "Greenw8.jpg",
+      "Greenw9.jpg",
+      "Greenw10.jpg",
+      "Greenw11.jpg",
+      "Greenw12.jpg",
+      "Greenw13.jpg"
+      ],
+      text: "<h1>July 26, 2025</h1>The frozen cake was sweet, but nothing compared to the way you looked at me with that quiet smile. We shared each bite slowly, savoring the cold on our tongues and the warmth between us. It was a moment, simple and perfect, like love frozen in time."
+    },
+    { //Page9
+      background: "url('BG_Road.jpg')",
+      slideshowImages: [
+      "Road1.jpg",
+      "Road2.jpg",
+      ],
+      text: "<h1>July 29, 2025</h1>It was just a short ride, the wind rushing past as we held on tight, but in that brief moment, everything else faded. Your arms around me felt like the safest place in the world, and the way you leaned your head against my back made the night feel softer."
+    },
+    { //Page10
+      background: "url('BG_Macasandig.jpg')",
+      slideshowImages: [
+      "Maca1.jpg",
+      "Maca2.jpg",
+      "Maca3.jpg",
+      "Maca4.jpg",
+      "Maca5.jpg",
+      "Maca6.jpg",
+      "Maca7.jpg",
+      "Maca8.jpg",
+      "Maca9.jpg",
+      "Maca10.jpg",
+      "Maca11.jpg",
+      "Maca12.jpg",
+      "Maca13.jpg",
+      "Maca14.jpg"
+      ],
+      text: "<h1>July 31, 2025</h1>We sat by the riverside, sharing fries, tuna pie, and C2 while you ranted, yet beautiful. I just watched, smiling between bites, thinking how lucky I am to love someone whose words I could listen to forever."
+    },
+    { //Page11
+      background: "url('BG_Night.jpg')",
+      slideshowImages: [
+      "Night1.jpg",
+      "Night2.jpg",
+      "Night3.jpg",
+      "Night4.jpg",
+      "Night5.jpg",
+      "Night6.jpg",
+      "Night7.jpg",
+      "Night8.jpg",
+      "Night9.jpg",
+      "Night10.jpg",
+      "Night11.jpg",
+      "Night12.jpg",
+      "Night13.jpg"
+      ],
+      text: "<h1>August 1, 2025</h1>You wanted to go to my place, sharing quiet smiles and easy conversation over a simple food. While were waiting for the others to come you brought a chuckie for me. Then we rode off with our friends, the wind rushing past as you held me tighter on the motorcycle. Laughter echoed between us as we made our way to the riverside, and even with everyone around, it still felt like it was just you and me."
+    },
+    { //Page12
+      background: "url('BG_7Eleven.jpg')",
+      slideshowImages: [
+      "7Elev1.jpg",
+      "7Elev2.jpg",
+      "7Elev3.jpg",
+      "7Elev4.jpg",
+      "7Elev5.jpg"
+      ],
+      text: "<h1>August 4, 2025(Kadlawon)</h1>I could see you waiting, and every step you took closer made my heart beat faster. When I finally arrived, your eyes lit up, i can finally see you again. In that moment, everything felt perfect, just you and me, finally together."
+    },
+    { //Page13
+      background: "url('BG_Pabukid.jpg')",
+      slideshowImages: [
+      "Pabukid1.jpg",
+      "Pabukid2.jpg",
+      "Pabukid3.jpg",
+      "Pabukid4.jpg",
+      "Pabukid5.jpg",
+      "Pabukid6.jpg",
+      "Pabukid7.jpg",
+      "Pabukid8.jpg",
+      "Pabukid9.jpg",
+      "Pabukid10.jpg",
+      "Pabukid11.jpg",
+      "Pabukid12.jpg",
+      "Pabukid13.jpg",
+      "Pabukid14.jpg",
+      "Pabukid15.jpg",
+      "Pabukid16.jpg",
+      "Pabukid17.jpg",
+      "Pabukid18.jpg",
+      "Pabukid19.jpg",
+      "Pabukid20.jpg"
+      ],
+      text: "<h1>August 4, 2025(Hapon)</h1>We shared a simple breakfast of egg, tocino, and rice at the PABUKID, the cool breeze mixing with the warmth of the morning sun. Every bite tasted better with you beside me, as the world stretched wide and peaceful around us. just us and the quiet beauty of the day."
+    },
+    { //Page14
+      background: "url('BG_Eden1.jpg')",
+      slideshowImages: [
+      "Eden1-1.jpg",
+      "Eden1-2.jpg",
+      "Eden1-3.jpg",
+      "Eden1-4.jpg",
+      "Eden1-5.jpg",
+      "Eden1-6.jpg",
+      "Eden1-7.jpg",
+      "Eden1-8.jpg",
+      "Eden1-9.jpg",
+      "Eden1-10.jpg",
+      "Eden1-11.jpg",
+      "Eden1-12.jpg",
+      "Eden1-13.jpg",
+      "Eden1-14.jpg"
+      ],
+      text: "<h1>August 4, 2025(Gabie)</h1>We lay together in the hammock, wrapped in the stillness of the night, stars scattered above us like quiet witnesses. Your head rested on my chest, and with every soft sway, I felt the world disappear. It was just us, the breeze, and the comfort of knowing we didn’t need anything else."
+    },
+    { //Page15
+      background: "url('BG_LX.jpg')",
+      slideshowImages: [
+      "LX1.jpg",
+      "LX2.jpg",
+      "LX3.jpg",
+      "LX4.jpg",
+      "LX5.jpg",
+      "LX6.jpg",
+      "LX7.jpg"
+      ],
+      text: "<h1>August 8, 2025(LX)</h1>We sat on the rooftop, sharing slices of pizza and sipping milk tea. You laughed between bites, and I couldn’t help but smile, because up there, with your hand in mine and the night wrapped around us, everything felt warm, simple, and beautifully ours."
+    },
+    { //Page16
+      background: "url('BG_Balay.jpg')",
+      slideshowImages: [
+      "Balay1.jpg",
+      "Balay2.jpg"
+      ],
+      text: "<h1>August 8, 2025(Balay)</h1>We shared a cozy meal at my place, laughing between bites and i get more food for you to eat. Afterward, we danced around, recording silly TikToks, messing up steps, bumping into each other, and laughing until our cheeks hurt. It wasn’t perfect, but with you, it was everything fun, sweet, and real."
+    },
+    { //Page17
+      background: "url('BG_Maca.jpg')",
+      slideshowImages: [
+      "Macas1.jpg",
+      "Macas2.jpg",
+      "Macas3.jpg",
+      "Macas4.jpg",
+      "Macas5.jpg",
+      "Macas6.jpg",
+      "Macas7.jpg",
+      "Macas8.jpg",
+      ],
+      text: "<h1>August 11, 2025(Kadlawon)</h1>You looked at me with that shy smile and said ''im hungry'', so we grabbed a food and rodeoff to the riverside. The breeze was gentle, the water was calm, and as we sat there i cant stop looking at you even tho its dark i can see you clearly as if your glowing in front of me."
+    },
+    { //Page18
+      background: "url('BG_CamHills.jpg')",
+      slideshowImages: [
+      "CamH1.jpg",
+      "CamH2.jpg",
+      "CamH3.jpg",
+      "CamH4.jpg",
+      "CamH5.jpg",
+      "CamH6.jpg",
+      "CamH7.jpg",
+      "CamH8.jpg",
+      "CamH9.jpg",
+      "CamH10.jpg",
+      "CamH11.jpg",
+      "CamH12.jpg",
+      "CamH13.jpg",
+      "CamH14.jpg",
+      "CamH15.jpg",
+      "CamH16.jpg",
+      "CamH17.jpg",
+      "CamH18.jpg",
+      "CamH19.jpg",
+      "CamH20.jpg",
+      "CamH21.jpg",
+      "CamH22.jpg",
+      "CamH23.jpg"
+      ],
+      text: "<h1>August 11, 2025(Hapon)</h1>We sat together at Camhills, sharing a frappe as the sun bathed everything in a soft, golden glow. The breeze was gentle, the view endless, but all I could focus on was you, smiling, peaceful, and so effortlessly beautiful. In that quiet moment, with the sun above and you beside me, everything felt right."
+    },
+    { //Page19
+      background: "url('BG_CamHills1.jpg')",
+      slideshowImages: [
+      "CamHi1.jpg",
+      "CamHi2.jpg",
+      "CamHi3.jpg",
+      "CamHi4.jpg",
+      "CamHi5.jpg",
+      "CamHi6.jpg",
+      "CamHi7.jpg",
+      "CamHi8.jpg",
+      "CamHi9.jpg",
+      "CamHi10.jpg",
+      "CamHi11.jpg",
+      "CamHi12.jpg",
+      "CamHi13.jpg",
+      "CamHi14.jpg",
+      "CamHi15.jpg",
+      "CamHi16.jpg",
+      "CamHi17.jpg",
+      "CamHi18.jpg",
+      "CamHi19.jpg"
+      ],
+      text: "<h1>August 11, 2025(Gabie)</h1>The rain fell softly around us as we sat under the dim glow of a light, sharing a warm bowl of ramen and a pack of fries. Your laughter mixing with the sound of raindrops. The night cool but our little corner warm with quiet joy. I watched your eyes shining, and in that rainy night it was a simple moment but i felt completely at peace."
+    },
+    { //Page20
+      background: "url('BG_Macas.jpg')",
+      slideshowImages: [
+      "Macasa1.jpg",
+      "Macasa2.jpg",
+      "Macasa3.jpg",
+      "Macasa4.jpg",
+      "Macasa5.jpg",
+      "Macasa6.jpg",
+      "Macasa7.jpg",
+      "Macasa8.jpg",
+      "Macasa9.jpg",
+      "Macasa10.jpg",
+      "Macasa12.jpg",
+      "Macasa13.jpg",
+      "Macasa14.jpg",
+      "Macasa15.jpg",
+      "Macasa16.jpg",
+      "Macasa17.jpg",
+      "Macasa18.jpg"
+      ],
+      text: "<h1>August 13, 2025</h1>You spoke quietly, pouring out everything on your mind, and I just listened. I didn’t interrupt, i just held your hand, letting you know I was there. In that moment, nothing else mattered. Just you, your words, and my promise to never let go of you. Until you get hungry and we eat nearby."
+    },
+    { //Page21
+      background: "url('BG_Bolonsori.jpg')",
+      slideshowImages: [
+      "Nyt1.jpg",
+      "Nyt2.jpg",
+      "Nyt3.jpg",
+      "Nyt4.jpg",
+      "Nyt5.jpg",
+      "Nyt6.jpg",
+      "Nyt7.jpg",
+      "Nyt8.jpg",
+      "Nyt9.jpg",
+      "Nyt10.jpg",
+      "Nyt11.jpg",
+      "Nyt12.jpg",
+      "Nyt13.jpg"
+      ],
+      text: "<h1>August 15, 2025</h1>We ate sisig by the riverside, the breeze gentle as you smiled between bites. After, we visited your father's grave, your hand holding mine tightly. I was just standing beside you, letting you know I was there, for the good days, the quiet ones, and the ones that hurt. I introduce my self but i forgot to say ''Father'' and you got mad. Even tho your mad your still cute YWIEIEIEIE."
+    },
+    { //Page22
+      background: "url('BG_Mall.jpg')",
+      slideshowImages: [
+      "Macasan1.jpg",
+      "Macasan2.jpg",
+      "Macasan3.jpg",
+      "Macasan4.jpg",
+      "Macasan5.jpg",
+      "Macasan6.jpg",
+      "Macasan7.jpg",
+      "Macasan8.jpg",
+      "Macasan9.jpg",
+      "Macasan20.jpg",
+      "Macasan11.jpg"
+      ],
+      text: "<h1>August 18, 2025</h1>We couldn’t decide where to eat, bouncing from Kurom but closed, to The Copeland but too pricey, until we ended up at Mang Inasal with only one pork left. I kept teasing, “I won’t kiss you if you eat chicken,” thinking you'd still get it since I knew you were hungry, but you didn’t. You smiled and held back. In that small moment, I felt so grateful that you chose me over your cravings. Later, in Macasandig, we finally found pork belly and ate together. I bought a milktea instead of softdrinks cuz i dont want you to keep drinking softdrinks, and it felt perfect just like us."
+    },
+    { //Page22
+      background: "url('BG_WillowCafe.jpg')",
+      slideshowImages: [
+      "Willow1.jpg",
+      "Willow2.jpg",
+      "Willow3.jpg",
+      "Willow4.jpg",
+      "Willow5.jpg",
+      "Willow6.jpg",
+      "Willow7.jpg",
+      "Willow8.jpg",
+      "Willow9.jpg",
+      "Willow10.jpg",
+      "Willow11.jpg",
+      "Willow12.jpg"
+    ],
+      text: "<h1>August 20, 2025</h1>We sat close together in the cozy café, sharing ramen, fries, and milk tea while the rain tapped gently on the windows. The aircon made it cold inside, but your warmth next to me made everything feel just right. You wrapped your hands around the cup, smiling between sips, and I couldn’t help but watch you like you were the only thing that mattered."
+    },
+    { //Page23
+      background: "url('BG_Bolao.jpg')",
+      slideshowImages: [
+      "Bolao1.jpg",
+      "Bolao2.jpg",
+      "Bolao3.jpg",
+      "Bolao4.jpg",
+      "Bolao5.jpg",
+      "Bolao6.jpg",
+      "Bolao7.jpg",
+      "Bolao8.jpg",
+      "Bolao9.jpg",
+      "Bolao10.jpg",
+      "Bolao11.jpg",
+      "Bolao12.jpg",
+      "Bolao13.jpg",
+      "Bolao14.jpg"
+    ],
+      text: "<h1>August 21, 2025(Bolao)</h1>We swam together in the cold spring, the water freezing but your laughter warming everything around me. You clung to my arm, shivering and smiling, and I couldn’t help but pull you closer. Nearby, a kid spoke in fluent English, making us laugh even more as we tried to keep up with his unexpected accent. I was quiet and waiting for you to jump, cuz when i jump its too cold for me to handle and i wanted a hug."
+    },
+    { //Page24
+      background: "url('BG_Sinulom.jpg')",
+      slideshowImages: [
+      "Sinulom1.jpg",
+      "Sinulom2.jpg",
+      "Sinulom3.jpg",
+      "Sinulom4.jpg"
+    ],
+      text: "<h1>August 21, 2025(Sinulom)</h1>We were swimming in the pool, shivering from the cold, but neither of us wanted to get out, we were having too much fun just being together. Even as your eye seeing your skin red but with my eye its just a normal color, we laughed and splashed, pretending it wasn’t that cold."
+    },
+    { //Page25
+      background: "url('BG_Heart1.jpg')",
+      slideshowImages: [
+      "UJ.jpg"
+      ],
+      text: "<h4>I don’t think you’ll ever fully realize just how much you mean to me. Every little thing you do, the way you smile, the way you laugh, even the way you get quiet when you're deep in thought, it all pulls me in. Loving you feels like the most natural thing in the world, like my heart was always meant to find yours. No matter where life takes us, I know one thing for sure, you’ll always be my favorite part of it.</h4>"
+    }
+  ];
+
+  const loginBg = "url('Anonymous.jpg')";
+
+  let currentPage = 0;
+  let pageElements;
+  let slideshowInterval;
+  let slideshowCurrentIndex = 0;
+
+  function setBackground(bg) {
+    document.body.style.backgroundImage = bg;
+  }
+
+  // Initialize album pages
+  function initAlbum() {
+    album.innerHTML = '';
+    pages.forEach((page, index) => {
+      const div = document.createElement('div');
+      div.classList.add('page');
+      div.style.transform = `translateX(${index * 100}%)`;
+
+      if (page.slideshowImages) {
+        div.innerHTML = `
+          <div class="slideshow-container">
+            ${page.slideshowImages.map((src, i) =>
+              `<img src="${src}" class="slideshow-image${i === 0 ? ' active' : ''}" alt="Slide ${i + 1}">`
+            ).join('')}
+            <div class="slideshow-controls"></div>
+          </div>
+          <div class="text">${page.text}</div>
+        `;
+      } else {
+        div.innerHTML = `
+          <img src="${page.img}" alt="Page ${index + 1}">
+          <div class="text">${page.text}</div>
+        `;
+      }
+
+      album.appendChild(div);
+    });
+    pageElements = document.querySelectorAll('.page');
+  }
+
+  function showPage(index) {
+    setBackground(pages[index].background);
+
+    pageElements.forEach((page, i) => {
+      page.style.transform = `translateX(${(i - index) * 100}%)`;
+      const textEl = page.querySelector('.text');
+      textEl.classList.remove('visible');
+      if (i === index) {
+        setTimeout(() => textEl.classList.add('visible'), 100);
+      }
+    });
+    currentPage = index;
+
+    clearInterval(slideshowInterval);
+    slideshowCurrentIndex = 0;
+
+    const slideEl = pageElements[currentPage].querySelector('.slideshow-container');
+    if (slideEl) setupSlideshow(pageElements[currentPage]);
+  }
+
+  function setupSlideshow(pageEl) {
+    const slides = pageEl.querySelectorAll('.slideshow-image');
+    const container = pageEl.querySelector('.slideshow-container');
+    let startX = 0, endX = 0, threshold = 50;
+
+    function showSlide(n) {
+      slides.forEach((s, i) => s.classList.toggle('active', i === n));
+      slideshowCurrentIndex = n;
+    }
+
+    function nextSlide() {
+      showSlide((slideshowCurrentIndex + 1) % slides.length);
+    }
+
+    function prevSlide() {
+      showSlide((slideshowCurrentIndex - 1 + slides.length) % slides.length);
+    }
+
+    container.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+    container.addEventListener('touchend', e => {
+      endX = e.changedTouches[0].clientX;
+      handleSwipe();
+    });
+    let dragging = false;
+    container.addEventListener('mousedown', e => { dragging = true; startX = e.clientX; });
+    container.addEventListener('mouseup', e => {
+      if (!dragging) return;
+      dragging = false;
+      endX = e.clientX;
+      handleSwipe();
+    });
+    container.addEventListener('mouseleave', () => dragging = false);
+
+    function handleSwipe() {
+      if (Math.abs(endX - startX) > threshold) {
+        (endX > startX) ? prevSlide() : nextSlide();
+        resetSlideshowTimer();
+      }
+    }
+
+    function resetSlideshowTimer() {
+      clearInterval(slideshowInterval);
+      slideshowInterval = setInterval(nextSlide, 4000);
+    }
+
+    slideshowInterval = setInterval(nextSlide, 4000);
+    showSlide(0);
+  }
+
+  prevBtn.addEventListener('click', () => showPage((currentPage - 1 + pages.length) % pages.length));
+  nextBtn.addEventListener('click', () => showPage((currentPage + 1) % pages.length));
+
+  loginBtn.addEventListener('click', () => {
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (accounts.some(a => a.username === username && a.password === password)) {
+      loginBox.style.display = 'none';
+      albumSection.style.display = 'flex';
+      setBackground(pages[0].background);
+      initAlbum();
+      showPage(0);
+    } else {
+      errorMsg.style.display = 'block';
+    }
+  });
+
+  [usernameInput, passwordInput].forEach(input =>
+    input.addEventListener('keydown', e => (e.key === 'Enter') && loginBtn.click())
+  );
+
+  // Initialize background for login screen
+  setBackground(loginBg);
+</script>
+</body>
+</html>
